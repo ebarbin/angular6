@@ -29,6 +29,11 @@
 </div>
 <div class="row">
   <div class="col-xs-12">
-    Ingredients
+    <ul class="list-group">
+      <a class="list-group-item" *ngFor="let ingredient of recipe.ingredients"
+        (click)="onRecipeIngredientSelected(ingredient)" style="cursor: pointer;">
+        {{ ingredient.name }} - {{ ingredient.amount }}
+    </a>
+    </ul>
   </div>
 </div>
