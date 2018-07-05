@@ -28,6 +28,7 @@ export class ShoppingListService {
     ingredients.forEach((ingredient) => {
       this.ingredients.push(ingredient);
     });
+    // this.ingredients.push(...ingredients);
     this.ingredientAdded.emit(this.ingredients.slice());
   }
 
