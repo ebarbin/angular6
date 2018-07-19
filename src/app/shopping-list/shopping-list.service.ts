@@ -8,6 +8,7 @@ import { Injectable, EventEmitter } from '@angular/core';
 export class ShoppingListService {
 
   ingredientAdded = new Subject<Ingredient[]>();
+  startedEditing = new Subject<number>();
 
   constructor() { }
 
@@ -18,6 +19,10 @@ export class ShoppingListService {
 
   getIngredients() {
     return this.ingredients.slice();
+  }
+
+  getIngredient(index: number) {
+    return this.ingredients.slice()[index];
   }
 
   addIngredient(ingredient: Ingredient) {
@@ -33,4 +38,8 @@ export class ShoppingListService {
     this.ingredientAdded.next(this.ingredients.slice());
   }
 
+  editIngredient(index: number, name: string, amount: number) {
+    this.ingredients[index].name = name;
+    this.ingredients[index].amount = amount;
+  }
 }
