@@ -7,7 +7,7 @@ import { Injectable, EventEmitter } from '@angular/core';
 })
 export class ShoppingListService {
 
-  ingredientAdded = new Subject<Ingredient[]>();
+  ingredientsChanged = new Subject<Ingredient[]>();
   startedEditing = new Subject<number>();
 
   constructor() { }
@@ -27,7 +27,7 @@ export class ShoppingListService {
 
   addIngredient(ingredient: Ingredient) {
     this.ingredients.push(ingredient);
-    this.ingredientAdded.next(this.ingredients.slice());
+    this.ingredientsChanged.next(this.ingredients.slice());
   }
 
   addIngredients(ingredients: Ingredient[]) {
@@ -35,11 +35,12 @@ export class ShoppingListService {
       this.ingredients.push(ingredient);
     });
     // this.ingredients.push(...ingredients);
-    this.ingredientAdded.next(this.ingredients.slice());
+    this.ingredientsChanged.next(this.ingredients.slice());
   }
 
-  editIngredient(index: number, name: string, amount: number) {
+  updateIngredient(index: number, name: string, amount: number) {
     this.ingredients[index].name = name;
     this.ingredients[index].amount = amount;
+    this.ingredientsChanged.next(this.ingredients.slice());
   }
 }
