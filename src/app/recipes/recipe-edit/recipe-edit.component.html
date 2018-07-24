@@ -4,7 +4,7 @@
       <div class="row">
         <div class="col-xs-12">
           <button class="btn btn-success" [disabled]="!recipeForm.valid" type="submit">Save</button>
-          <button class="btn btn-danger" type="button">Cancel</button>
+          <button class="btn btn-danger" routerLink="/recipes" type="button">Cancel</button>
         </div>
       </div>
       <div class="row">
@@ -46,7 +46,7 @@
               formControlName="description"
               id="description"
               class="form-control" rows="6"></textarea>
-              <span *ngIf="!recipeForm.get('imagePath').valid" class="pull-right help-block">Description is required</span>
+              <span *ngIf="!recipeForm.get('description').valid" class="pull-right help-block">Description is required</span>
           </div>
         </div>
       </div>

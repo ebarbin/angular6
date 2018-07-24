@@ -28,7 +28,7 @@ export class RecipesService {
   ];
 
   getRecipe(id: number) {
-    return this.recipes.slice().find((recipe: Recipe) => {
+    return this.recipes.slice().find((recipe: Recipe, index: number) => {
       return recipe.id === id;
     });
   }
@@ -38,6 +38,7 @@ export class RecipesService {
   }
 
   addRecipe(recipe: Recipe) {
+    recipe.id = new Date().getMilliseconds();
     this.recipes.push(recipe);
     this.recipesChanged.next(this.recipes.slice());
   }
@@ -61,4 +62,9 @@ export class RecipesService {
     this.shoppingListService.addIngredient(ingredient);
   }
 
+  deleteRecipe(recipe: Recipe) {
+    const index = this.recipes.findIndex(rec => rec.id === recipe.id);
+    this.recipes = this.recipes.splice(index, 1);
+    this.recipesChanged.next(this.recipes);
+  }
 }
