@@ -2,7 +2,11 @@ import { Subject } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { Recipe } from './recipe.model';
 import { Ingredient } from '../shared/ingredient.model';
+import { Response } from '../shared/response.model';
 import { ShoppingListService } from '../shopping-list/shopping-list.service';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { catchError, map } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -11,21 +15,9 @@ export class RecipesService {
 
   recipesChanged = new Subject<Recipe[]>();
 
-  constructor(private shoppingListService: ShoppingListService) { }
+  constructor(private httpClient: HttpClient, private shoppingListService: ShoppingListService) { }
 
-  private recipes: Recipe[] = [
-    new Recipe(0, 'A test Recipe', 'This is a simply recipe',
-    'http://www.foodtolove.com.au/assets/images/badge-collection.png',
-    [
-      new Ingredient('Meat', 1),
-      new Ingredient('Bread', 10)
-    ]),
-    new Recipe(1, 'A test Recipe 2', 'This is a simply recipe 2',
-    'http://www.foodtolove.com.au/assets/images/badge-collection.png', [
-      new Ingredient('Apple', 3),
-      new Ingredient('Bun', 7)
-    ])
-  ];
+  private recipes: Recipe[] = [];
 
   getRecipe(id: number) {
     return this.recipes.slice().find((recipe: Recipe, index: number) => {
@@ -34,13 +26,33 @@ export class RecipesService {
   }
 
   getRecipes() {
-    return this.recipes.slice(); // slice return a copy of array, NOT the same reference!
+    return this.httpClient.get('pep-api/recipe')
+    .pipe(
+      map((response: Response) => {
+        this.recipes = <Recipe[]>response.body;
+        return this.recipes.slice();
+      }),
+      catchError((errorResponse: HttpErrorResponse) => {
+        return throwError(errorResponse.error);
+      })
+    );
   }
 
   addRecipe(recipe: Recipe) {
     recipe.id = new Date().getMilliseconds();
-    this.recipes.push(recipe);
-    this.recipesChanged.next(this.recipes.slice());
+
+    this.httpClient.post('pep-api/recipe', recipe)
+    .pipe(
+      map((response: Response) => {
+        return <Recipe>response.body;
+      }),
+      catchError((errorResponse: HttpErrorResponse) => {
+        return throwError(errorResponse.error);
+      })
+    ).subscribe((reci: Recipe) => {
+      this.recipes.push(reci);
+      this.recipesChanged.next(this.recipes.slice());
+    });
   }
 
   updateRecipe(id: number, recipeUpdated: Recipe) {
@@ -51,7 +63,18 @@ export class RecipesService {
     recipe.description = recipeUpdated.description;
     recipe.imagePath = recipeUpdated.imagePath;
     recipe.ingredients = recipeUpdated.ingredients;
-    this.recipesChanged.next(this.recipes.slice());
+
+    this.httpClient.put('pep-api/recipe/' + recipe.id, recipe)
+    .pipe(
+      map((response: Response) => {
+        return <Recipe>response.body;
+      }),
+      catchError((errorResponse: HttpErrorResponse) => {
+        return throwError(errorResponse.error);
+      })
+    ).subscribe((reci: Recipe) => {
+      this.recipesChanged.next(this.recipes.slice());
+    });
   }
 
   addIngredients(ingredients: Ingredient[]) {
@@ -63,8 +86,20 @@ export class RecipesService {
   }
 
   deleteRecipe(recipe: Recipe) {
-    const index = this.recipes.findIndex(rec => rec.id === recipe.id);
-    this.recipes = this.recipes.splice(index, 1);
-    this.recipesChanged.next(this.recipes);
+    return this.httpClient.delete('pep-api/recipe/' + recipe.id)
+    .pipe(
+      map((response: Response) => {
+        return response.body;
+      }),
+      catchError((errorResponse: HttpErrorResponse) => {
+        return throwError(errorResponse.error);
+      })
+    ).subscribe((response: any) => {
+
+      const index = this.recipes.findIndex(rec => rec.id === recipe.id);
+      this.recipes.splice(index, 1);
+
+      this.recipesChanged.next(this.recipes.slice());
+    });
   }
 }
