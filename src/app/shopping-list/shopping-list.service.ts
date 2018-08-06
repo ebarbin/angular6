@@ -1,6 +1,10 @@
 import { Subject } from 'rxjs';
 import { Ingredient } from './../shared/ingredient.model';
-import { Injectable, EventEmitter } from '@angular/core';
+import { Injectable } from '@angular/core';
+import { Response } from '../shared/response.model';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { catchError, map } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -8,26 +12,46 @@ import { Injectable, EventEmitter } from '@angular/core';
 export class ShoppingListService {
 
   ingredientsChanged = new Subject<Ingredient[]>();
-  startedEditing = new Subject<number>();
+  startedEditing = new Subject<Ingredient>();
 
-  constructor() { }
+  constructor(private httpClient: HttpClient) { }
 
-  private ingredients: Ingredient[] = [
-    new Ingredient('Apple', 5),
-    new Ingredient('Tomatoes', 10)
-  ];
+  private ingredients: Ingredient[] = [];
 
   getIngredients() {
-    return this.ingredients.slice();
+    return this.httpClient.get('pep-api/ingredient')
+    .pipe(
+      map((response: Response) => {
+        this.ingredients = <Ingredient[]>response.body;
+        return this.ingredients.slice();
+      }),
+      catchError((errorResponse: HttpErrorResponse) => {
+        return throwError(errorResponse.error);
+      })
+    );
   }
 
-  getIngredient(index: number) {
-    return this.ingredients.slice()[index];
+  getIngredient(id: number) {
+    return this.ingredients.slice().find((ingredient: Ingredient, index: number) => {
+      return ingredient.id === id;
+    });
   }
 
   addIngredient(ingredient: Ingredient) {
-    this.ingredients.push(ingredient);
-    this.ingredientsChanged.next(this.ingredients.slice());
+    ingredient.id = new Date().getMilliseconds();
+    this.httpClient.post('pep-api/ingredient', ingredient)
+    .pipe(
+      map((response: Response) => {
+        return <Ingredient>response.body;
+      }),
+      catchError((errorResponse: HttpErrorResponse) => {
+        return throwError(errorResponse.error);
+      })
+    ).subscribe(() => {
+      this.getIngredients().subscribe(() => {
+        this.updateModel();
+      });
+    });
   }
 
   addIngredients(ingredients: Ingredient[]) {
@@ -38,14 +62,41 @@ export class ShoppingListService {
     this.ingredientsChanged.next(this.ingredients.slice());
   }
 
-  updateIngredient(index: number, name: string, amount: number) {
-    this.ingredients[index].name = name;
-    this.ingredients[index].amount = amount;
-    this.ingredientsChanged.next(this.ingredients.slice());
+  updateIngredient(ingredient: Ingredient) {
+    this.httpClient.put('pep-api/ingredient/' + ingredient.id, ingredient)
+    .pipe(
+      map((response: Response) => {
+        return <Ingredient>response.body;
+      }),
+      catchError((errorResponse: HttpErrorResponse) => {
+        return throwError(errorResponse.error);
+      })
+    ).subscribe((ingre: Ingredient) => {
+      this.getIngredients().subscribe(() => {
+        this.updateModel();
+      });
+    });
   }
 
-  deleteIngredient(index: number) {
-    this.ingredients.splice(index, 1);
-    this.ingredientsChanged.next(this.ingredients.slice());
+  deleteIngredient(ingredient: Ingredient) {
+    this.httpClient.delete('pep-api/ingredient/' + ingredient.id)
+    .pipe(
+      map((response: Response) => {
+        return <Ingredient>response.body;
+      }),
+      catchError((errorResponse: HttpErrorResponse) => {
+        return throwError(errorResponse.error);
+      })
+    ).subscribe(() => {
+      this.getIngredients().subscribe(() => {
+        this.updateModel();
+      });
+    });
+  }
+
+  private updateModel() {
+    this.getIngredients().subscribe(() => {
+      this.ingredientsChanged.next(this.ingredients);
+    });
   }
 }

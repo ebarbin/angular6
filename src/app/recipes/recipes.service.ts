@@ -50,8 +50,7 @@ export class RecipesService {
         return throwError(errorResponse.error);
       })
     ).subscribe((reci: Recipe) => {
-      this.recipes.push(reci);
-      this.recipesChanged.next(this.recipes.slice());
+      this.updateModel();
     });
   }
 
@@ -73,7 +72,7 @@ export class RecipesService {
         return throwError(errorResponse.error);
       })
     ).subscribe((reci: Recipe) => {
-      this.recipesChanged.next(this.recipes.slice());
+      this.updateModel();
     });
   }
 
@@ -95,11 +94,13 @@ export class RecipesService {
         return throwError(errorResponse.error);
       })
     ).subscribe((response: any) => {
+      this.updateModel();
+    });
+  }
 
-      const index = this.recipes.findIndex(rec => rec.id === recipe.id);
-      this.recipes.splice(index, 1);
-
-      this.recipesChanged.next(this.recipes.slice());
+  private updateModel() {
+    this.getRecipes().subscribe(() => {
+      this.recipesChanged.next(this.recipes);
     });
   }
 }

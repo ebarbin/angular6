@@ -12,7 +12,7 @@ import { Subscription } from '../../../../node_modules/rxjs';
 export class ShoppingEditComponent implements OnInit, OnDestroy {
 
   editMode = false;
-  editIngredientIndex: number;
+  editIngredient: Ingredient;
 
   subs: Subscription;
   @ViewChild('f') ingredientForm: NgForm;
@@ -20,11 +20,10 @@ export class ShoppingEditComponent implements OnInit, OnDestroy {
   constructor(private shoppingListService: ShoppingListService) { }
 
   ngOnInit() {
-    this.subs = this.shoppingListService.startedEditing.subscribe((index: number) => {
+    this.subs = this.shoppingListService.startedEditing.subscribe((ingredient: Ingredient) => {
       this.editMode = true;
-      this.editIngredientIndex = index;
-      const editIngredient = this.shoppingListService.getIngredient(index);
-      this.ingredientForm.form.patchValue({name: editIngredient.name, amount: editIngredient.amount});
+      this.editIngredient = ingredient;
+      this.ingredientForm.form.patchValue({name: ingredient.name, amount: ingredient.amount});
     });
   }
 
@@ -35,11 +34,11 @@ export class ShoppingEditComponent implements OnInit, OnDestroy {
   onClear() {
     this.ingredientForm.reset();
     this.editMode = false;
-    this.editIngredientIndex = null;
+    this.editIngredient = null;
   }
 
   onDelete() {
-    this.shoppingListService.deleteIngredient(this.editIngredientIndex);
+    this.shoppingListService.deleteIngredient(this.editIngredient);
     this.onClear();
   }
 
@@ -49,9 +48,11 @@ export class ShoppingEditComponent implements OnInit, OnDestroy {
     if (!this.editMode) {
       this.shoppingListService.addIngredient(new Ingredient(name, amount));
     } else {
-      this.shoppingListService.updateIngredient(this.editIngredientIndex, name, amount);
+      this.editIngredient.name = name;
+      this.editIngredient.amount = amount;
+      this.shoppingListService.updateIngredient(this.editIngredient);
       this.editMode = false;
-      this.editIngredientIndex = null;
+      this.editIngredient = null;
     }
     this.ingredientForm.reset();
   }
