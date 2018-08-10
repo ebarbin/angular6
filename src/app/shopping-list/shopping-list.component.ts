@@ -13,7 +13,7 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
   ingredients: Ingredient[];
   subs: Subscription;
 
-  selectedId: number;
+  selectedId: string;
 
   constructor(private shoppingListService: ShoppingListService) { }
 

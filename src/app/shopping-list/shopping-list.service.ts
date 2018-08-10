@@ -1,7 +1,7 @@
+import { CustomResponse } from './../shared/custom-response.model';
 import { Subject } from 'rxjs';
 import { Ingredient } from '../shared/ingredient.model';
 import { Injectable } from '@angular/core';
-import { Response } from '../shared/response.model';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
 import { throwError } from 'rxjs';
@@ -21,7 +21,7 @@ export class ShoppingListService {
   getIngredients() {
     return this.httpClient.get('pep-api/ingredient')
     .pipe(
-      map((response: Response) => {
+      map((response: CustomResponse) => {
         this.ingredients = <Ingredient[]>response.body;
         return this.ingredients.slice();
       }),
@@ -31,7 +31,7 @@ export class ShoppingListService {
     );
   }
 
-  getIngredient(id: number) {
+  getIngredient(id: string) {
     return this.ingredients.slice().find((ingredient: Ingredient, index: number) => {
       return ingredient.id === id;
     });
@@ -40,7 +40,7 @@ export class ShoppingListService {
   addIngredient(ingredient: Ingredient) {
     this.httpClient.post('pep-api/ingredient', ingredient)
     .pipe(
-      map((response: Response) => {
+      map((response: CustomResponse) => {
         return <Ingredient>response.body;
       }),
       catchError((errorResponse: HttpErrorResponse) => {
@@ -56,7 +56,7 @@ export class ShoppingListService {
   addIngredients(ingredients: Ingredient[]) {
     this.httpClient.post('pep-api/ingredient/multi', ingredients)
     .pipe(
-      map((response: Response) => {
+      map((response: CustomResponse) => {
         return <Ingredient>response.body;
       }),
       catchError((errorResponse: HttpErrorResponse) => {
@@ -72,7 +72,7 @@ export class ShoppingListService {
   updateIngredient(ingredient: Ingredient) {
     this.httpClient.put('pep-api/ingredient/' + ingredient.id, ingredient)
     .pipe(
-      map((response: Response) => {
+      map((response: CustomResponse) => {
         return <Ingredient>response.body;
       }),
       catchError((errorResponse: HttpErrorResponse) => {
@@ -88,7 +88,7 @@ export class ShoppingListService {
   deleteIngredient(ingredient: Ingredient) {
     this.httpClient.delete('pep-api/ingredient/' + ingredient.id)
     .pipe(
-      map((response: Response) => {
+      map((response: CustomResponse) => {
         return <Ingredient>response.body;
       }),
       catchError((errorResponse: HttpErrorResponse) => {

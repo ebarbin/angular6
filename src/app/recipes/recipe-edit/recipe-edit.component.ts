@@ -11,7 +11,7 @@ import { Recipe } from '../recipe.model';
 })
 export class RecipeEditComponent implements OnInit {
 
-  id: number;
+  id: string;
   editMode = false;
   recipeForm: FormGroup;
 
@@ -19,7 +19,7 @@ export class RecipeEditComponent implements OnInit {
 
   ngOnInit() {
     this.route.params.subscribe((params: Params) => {
-      this.id = +params['id'];
+      this.id = params['id'];
       this.editMode = params['id'] != null;
       console.log(this.id);
       console.log(this.editMode);

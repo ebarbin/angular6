@@ -1,8 +1,8 @@
+import { CustomResponse } from './../shared/custom-response.model';
 import { Subject } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { Recipe } from './recipe.model';
 import { Ingredient } from '../shared/ingredient.model';
-import { Response } from '../shared/response.model';
 import { ShoppingListService } from '../shopping-list/shopping-list.service';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
@@ -19,7 +19,7 @@ export class RecipesService {
 
   private recipes: Recipe[] = [];
 
-  getRecipe(id: number) {
+  getRecipe(id: string) {
     return this.recipes.slice().find((recipe: Recipe, index: number) => {
       return recipe.id === id;
     });
@@ -28,7 +28,7 @@ export class RecipesService {
   getRecipes() {
     return this.httpClient.get('pep-api/recipe')
     .pipe(
-      map((response: Response) => {
+      map((response: CustomResponse) => {
         this.recipes = <Recipe[]>response.body;
         return this.recipes.slice();
       }),
@@ -41,7 +41,7 @@ export class RecipesService {
   addRecipe(recipe: Recipe) {
     this.httpClient.post('pep-api/recipe', recipe)
     .pipe(
-      map((response: Response) => {
+      map((response: CustomResponse) => {
         return <Recipe>response.body;
       }),
       catchError((errorResponse: HttpErrorResponse) => {
@@ -52,7 +52,7 @@ export class RecipesService {
     });
   }
 
-  updateRecipe(id: number, recipeUpdated: Recipe) {
+  updateRecipe(id: string, recipeUpdated: Recipe) {
     const recipe = this.recipes.find((r: Recipe) => {
       return r.id === id;
     });
@@ -63,7 +63,7 @@ export class RecipesService {
 
     this.httpClient.put('pep-api/recipe/' + recipe.id, recipe)
     .pipe(
-      map((response: Response) => {
+      map((response: CustomResponse) => {
         return <Recipe>response.body;
       }),
       catchError((errorResponse: HttpErrorResponse) => {
@@ -85,7 +85,7 @@ export class RecipesService {
   deleteRecipe(recipe: Recipe) {
     return this.httpClient.delete('pep-api/recipe/' + recipe.id)
     .pipe(
-      map((response: Response) => {
+      map((response: CustomResponse) => {
         return response.body;
       }),
       catchError((errorResponse: HttpErrorResponse) => {

@@ -1,4 +1,4 @@
 export class Ingredient {
-  public id: number;
+  public id: string;
   constructor(public name: string, public amount: number) {}
 }
