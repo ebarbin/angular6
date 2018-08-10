@@ -1,5 +1,5 @@
-import { RecipesService } from './../recipes.service';
-import { Ingredient } from './../../shared/ingredient.model';
+import { RecipesService } from '../recipes.service';
+import { Ingredient } from '../../shared/ingredient.model';
 import { Component, OnInit } from '@angular/core';
 import { Recipe } from '../recipe.model';
 import { ActivatedRoute, Params, Router } from '@angular/router';

@@ -1,5 +1,5 @@
 import { Subject } from 'rxjs';
-import { Ingredient } from './../shared/ingredient.model';
+import { Ingredient } from '../shared/ingredient.model';
 import { Injectable } from '@angular/core';
 import { Response } from '../shared/response.model';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
@@ -38,7 +38,6 @@ export class ShoppingListService {
   }
 
   addIngredient(ingredient: Ingredient) {
-    ingredient.id = new Date().getMilliseconds();
     this.httpClient.post('pep-api/ingredient', ingredient)
     .pipe(
       map((response: Response) => {
@@ -55,11 +54,19 @@ export class ShoppingListService {
   }
 
   addIngredients(ingredients: Ingredient[]) {
-    ingredients.forEach((ingredient) => {
-      this.ingredients.push(ingredient);
+    this.httpClient.post('pep-api/ingredient/multi', ingredients)
+    .pipe(
+      map((response: Response) => {
+        return <Ingredient>response.body;
+      }),
+      catchError((errorResponse: HttpErrorResponse) => {
+        return throwError(errorResponse.error);
+      })
+    ).subscribe(() => {
+      this.getIngredients().subscribe(() => {
+        this.updateModel();
+      });
     });
-    // this.ingredients.push(...ingredients);
-    this.ingredientsChanged.next(this.ingredients.slice());
   }
 
   updateIngredient(ingredient: Ingredient) {

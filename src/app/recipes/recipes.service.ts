@@ -39,8 +39,6 @@ export class RecipesService {
   }
 
   addRecipe(recipe: Recipe) {
-    recipe.id = new Date().getMilliseconds();
-
     this.httpClient.post('pep-api/recipe', recipe)
     .pipe(
       map((response: Response) => {

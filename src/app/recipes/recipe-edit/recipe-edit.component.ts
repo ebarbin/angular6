@@ -1,7 +1,7 @@
-import { RecipesService } from './../recipes.service';
+import { RecipesService } from '../recipes.service';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
-import { NgForm, FormGroup, FormControl, Validators, FormArray } from '../../../../node_modules/@angular/forms';
+import { NgForm, FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
 import { Recipe } from '../recipe.model';
 
 @Component({
