@@ -1,3 +1,4 @@
+import { CodemirrorModule } from '@ctrl/ngx-codemirror';
 import { ShoppingListModule } from './shopping-list/shopping-list.module';
 import { SharedModule } from './shared/shared.module';
 import { RecipeModule } from './recipes/recipe.module';
@@ -26,6 +27,7 @@ import { SigninComponent } from './auth/signin/signin.component';
     SharedModule,
     RecipeModule,
     ShoppingListModule,
+    CodemirrorModule
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },

@@ -3,6 +3,14 @@
     <form (ngSubmit)="onSubmit(f)" #f="ngForm">
       <div class="form-group">
         <label for="email">Mail</label>
+        <ngx-codemirror
+        name="email" ngModel
+        [options]="{
+          lineNumbers: true,
+          theme: 'material',
+          mode: 'typescript'
+        }"
+      ></ngx-codemirror>
         <input type="email" id="email" name="email" ngModel class="form-control">
       </div>
       <div class="form-group">
@@ -13,4 +21,8 @@
     </form>
   </div>
 </div>
+<div class="row">
+    <div class="col-xs-10">
 
+</div>
+</div>
